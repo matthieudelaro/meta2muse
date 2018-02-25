@@ -5,6 +5,8 @@ import pandas as pd  # xlsx requires xlrd (pip install xlrd)
 import os
 import math
 
+from parameters import columns_names
+
 
 def safe_child(parent, child_name):
     """
@@ -37,6 +39,56 @@ def find_or_create_with_values(parent, children_tag_names, attr_to_text):
         child.text = attr_to_text[key]
 
 
+def convert_one_file(xlsx, input_path, output_path):
+    filename = os.path.basename(input_path)  # extract the end of file path
+    print('Processing {} ...'.format(filename))
+    filename = os.path.splitext(filename)[0]  # remove the extension from the name
+    result = sorted(xlsx.iterrows(),
+                    key=lambda row: difflib.SequenceMatcher(None, row[1][
+                        columns_names['original_title']], filename).ratio(),
+                    reverse=True  # see https://stackoverflow.com/a/17903726
+                    # This might be a better approach: https://stackoverflow.com/a/36132391
+                    )  # sort row of xlsx to get the row
+    # which has the title closest to the filename
+
+    song_id, song_data = result[0]  # take the first (best) result
+
+    def safe_value(key):
+        """Deals with unset columns, resulting in NaN values"""
+        value = song_data[columns_names[key]]
+        if not isinstance(value, str) and math.isnan(value):
+            value = ' '  # TODO: make sure this placeholder is a good idea
+        return str(value)
+
+    print('Selected XLSX row {} ({}): "{}"'.format(
+        song_id, safe_value('work-number'), safe_value('work-title')
+    ))
+
+
+    # update xml file
+    tree = ET.parse(input_path)
+    root = tree.getroot()
+
+    work = safe_child(root, 'work')
+    work_number = safe_child(work, 'work-number')
+    work_number.text = safe_value('work-number')
+    work_title = safe_child(work, 'work-title')
+    work_title.text = safe_value('work-title')
+
+    identification = safe_child(root, 'identification')
+    find_or_create_with_values(identification, 'creator', {
+        'composer': safe_value('composer'),
+        'lyricist': safe_value('lyricist'),
+        'arranger': safe_value('arranger'),
+    })
+
+    rights = safe_child(identification, 'rights')
+    rights.text = safe_value('rights')
+
+    # Save the result to a file
+    tree.write(output_path)
+
+
 if __name__ == '__main__':
     frozen_sib2muse_simple_path = '/Users/matthieu/Documents/perso/GCN/friday/test Matthieu/Allez, Dieu vous envoie Brut A4 Sib7 importé dans MuseScore puis exporté en XML.xml'
     tmp_sib2muse_simple_path = 'sib2muse_simple.xml'
@@ -61,20 +113,12 @@ if __name__ == '__main__':
     #     print()
     filename = os.path.basename(frozen_sib2muse_simple_path)  # extract the end of file path
     filename = os.path.splitext(filename)[0]  # remove the extension from the name
-    columns_names = {
-        'original_title': "Titre original (sous-Titre d'une partition de la traduction)",
-        'work-number': 'Ordre physique',
-        'work-title': "Titre original (sous-Titre d'une partition de la traduction)",
-        'rights': 'Copyright Internationale',
-        'composer': 'Compositeur',
-        'lyricist': 'Auteur',
-        'arranger': 'Auteur',
-    }
     result = sorted(xlsx.iterrows(),
-                    key=lambda row: difflib.SequenceMatcher(None, row[1][columns_names['original_title']], filename).ratio(),
+                    key=lambda row: difflib.SequenceMatcher(None, row[1][
+                        columns_names['original_title']], filename).ratio(),
                     reverse=True  # see https://stackoverflow.com/a/17903726
-       # This might be a better approach: https://stackoverflow.com/a/36132391
-    )  # sort row of xlsx to get the row
+                    # This might be a better approach: https://stackoverflow.com/a/36132391
+                    )  # sort row of xlsx to get the row
     # which has the title closest to the filename
 
     song_id, song_data = result[0]  # take the first (best) result
