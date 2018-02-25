@@ -1,0 +1,4 @@
+lxml
+difflib
+pandas
+xlrd
