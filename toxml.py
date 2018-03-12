@@ -5,8 +5,10 @@ import pandas as pd  # xlsx requires xlrd (pip install xlrd)
 import os
 import math
 
-from parameters import columns_names
+from parameters import column_infos_from_header
 
+def isNan(value):
+    return not isinstance(value, str) and math.isnan(value)
 
 def safe_child(parent, child_name):
     """
@@ -39,30 +41,72 @@ def find_or_create_with_values(parent, children_tag_names, attr_to_text):
         child.text = attr_to_text[key]
 
 
-def convert_one_file(xlsx, input_path, output_path):
+def row_to_field(base_name, row, column_info, default=None):
+    column_names, various_names_to_tag = column_info
+    data = row[1]
+    base_name_dot = base_name + '.'
+    titles = [name for name in column_names if (name == base_name or base_name_dot in name) and not isNan(data.loc[name])]
+    if len(titles) == 0:
+        return default
+    elif len(titles) == 1:
+        return titles[0]
+    else:
+        beginning_of_digits = len(base_name_dot)
+        maxTitle = None
+        maxValue = 0
+        for title in titles:
+            try:
+                value = int(title[beginning_of_digits:])
+            except ValueError:
+                value = 0
+            if value > maxValue:
+                maxValue = value
+                maxTitle = title
+        return maxTitle
+
+
+def columnBaseNamesFromColumnInfo(column_info):
+    column_names, various_names_to_tag = column_info
+    nameToBaseName = {
+        name: name.split('.')[0]
+        for name in column_names
+    }
+    baseNameToNames = {}
+    for name, base_name in nameToBaseName.items():
+        if base_name not in baseNameToNames:
+            baseNameToNames[base_name] = [base_name]
+        if not name in baseNameToNames[base_name]:
+            baseNameToNames[base_name].append(name)
+    return baseNameToNames, nameToBaseName
+
+
+def convert_one_file(xlsx, column_info, input_path, output_path):
+    column_names, various_names_to_tag = column_info
     filename = os.path.basename(input_path)  # extract the end of file path
     print('Processing {} ...'.format(filename))
     filename = os.path.splitext(filename)[0]  # remove the extension from the name
     result = sorted(xlsx.iterrows(),
-                    key=lambda row: difflib.SequenceMatcher(None, row[1][
-                        columns_names['original_title']], filename).ratio(),
+                    key=lambda row: difflib.SequenceMatcher(None,
+                        # row[1][column_names['original_title']], # uncomment this line and comment the next one to match files with main title instead of local name
+                        row_to_field('titre', row, column_info, default='titre'),
+                        filename).ratio(),
                     reverse=True  # see https://stackoverflow.com/a/17903726
                     # This might be a better approach: https://stackoverflow.com/a/36132391
                     )  # sort row of xlsx to get the row
     # which has the title closest to the filename
-
-    song_id, song_data = result[0]  # take the first (best) result
+    row = result[0]
+    song_id, song_data = row  # take the first (best) result
 
     def safe_value(key):
         """Deals with unset columns, resulting in NaN values"""
-        value = song_data[columns_names[key]]
+        value = song_data[column_names[key]]
         if not isinstance(value, str) and math.isnan(value):
             value = ' '  # TODO: make sure this placeholder is a good idea
         return str(value)
 
-    print('Selected XLSX row {} ({}): "{}"'.format(
-        song_id, safe_value('work-number'), safe_value('work-title')
-    ))
+    # print('Selected XLSX row {} ({}): "{}"'.format(
+    #     song_id, safe_value('work-number'), safe_value('work-title')
+    # ))
 
 
     # update xml file
@@ -70,20 +114,53 @@ def convert_one_file(xlsx, input_path, output_path):
     root = tree.getroot()
 
     work = safe_child(root, 'work')
-    work_number = safe_child(work, 'work-number')
-    work_number.text = safe_value('work-number')
-    work_title = safe_child(work, 'work-title')
-    work_title.text = safe_value('work-title')
+
+    # convert legacy tag names into new tag names
+    def convert_if_exist(parent, child_name, new_child_name):
+        """
+        """
+        try:
+            child = parent.find('./{}'.format(child_name))
+        except KeyError:
+            child = None
+
+        if child is None:
+            pass
+        else:
+            child.tag = new_child_name
+        return child
 
     identification = safe_child(root, 'identification')
-    find_or_create_with_values(identification, 'creator', {
-        'composer': safe_value('composer'),
-        'lyricist': safe_value('lyricist'),
-        'arranger': safe_value('arranger'),
-    })
+    for legacy_name, new_name in various_names_to_tag.items():
+        convert_if_exist(work, legacy_name, new_name)
+        convert_if_exist(identification, legacy_name, new_name)
 
-    rights = safe_child(identification, 'rights')
-    rights.text = safe_value('rights')
+    # fill tags with proper metadata, or with ' ' placeholder
+    baseNameToNames, nameToBaseName = columnBaseNamesFromColumnInfo(column_info)
+    for baseName in baseNameToNames:
+        xml_elem = safe_child(identification, baseName)
+        overloading_column_name = row_to_field(baseName, row,
+                                               column_info, baseName)
+        value = song_data[overloading_column_name]
+        if not isinstance(value, str) and math.isnan(value):
+            value = ' '
+        xml_elem.text = str(value)
+
+
+    # work_number = safe_child(work, 'work-number')
+    # work_number.text = safe_value('work-number')
+    # work_title = safe_child(work, 'work-title')
+    # work_title.text = safe_value('work-title')
+    #
+    # identification = safe_child(root, 'identification')
+    # find_or_create_with_values(identification, 'creator', {
+    #     'composer': safe_value('composer'),
+    #     'lyricist': safe_value('lyricist'),
+    #     'arranger': safe_value('arranger'),
+    # })
+    #
+    # rights = safe_child(identification, 'rights')
+    # rights.text = safe_value('rights')
 
     # Save the result to a file
     tree.write(output_path)

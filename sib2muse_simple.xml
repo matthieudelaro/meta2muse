@@ -1,11 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
   <work>
-    <work-title>Allez, Dieu vous envoie</work-title>
-    <work-number>541</work-number></work>
+    <work-title>Artemas Blank Score</work-title>
+    </work>
   <identification>
-    <creator type="composer"> </creator>
-    <rights>Les Ateliers du Chemin Neuf</rights>
+    <creator type="composer">COMMUNAUTÉ DU CHEMIN N EUF</creator>
+    <rights>Copyright © Artemas</rights>
     <encoding>
       <software>MuseScore 2.1.0</software>
       <encoding-date>2018-02-22</encoding-date>
@@ -15,7 +16,7 @@
       <supports element="print" attribute="new-system" type="yes" value="yes"/>
       <supports element="stem" type="yes"/>
       </encoding>
-    <creator lyricist="lyricist"> </creator><creator arranger="arranger"> </creator><creator composer="composer"> </creator></identification>
+    </identification>
   <defaults>
     <scaling>
       <millimeters>6</millimeters>
@@ -38,10 +39,10 @@
     <credit-words default-x="700" default-y="1880" justify="center" valign="top" font-size="24">Artemas Blank Score</credit-words>
     </credit>
   <credit page="1">
-    <credit-words default-x="1300" default-y="1780" justify="right" valign="bottom" font-size="12">COMMUNAUT&#201; DU CHEMIN N EUF</credit-words>
+    <credit-words default-x="1300" default-y="1780" justify="right" valign="bottom" font-size="12">COMMUNAUTÉ DU CHEMIN N EUF</credit-words>
     </credit>
   <credit page="1">
-    <credit-words default-x="700" default-y="100" justify="center" valign="bottom" font-size="8">Copyright &#169; Artemas</credit-words>
+    <credit-words default-x="700" default-y="100" justify="center" valign="bottom" font-size="8">Copyright © Artemas</credit-words>
     </credit>
   <part-list>
     <score-part id="P1">
@@ -49,7 +50,7 @@
       <score-instrument id="P1-I1">
         <instrument-name>Piano (2)</instrument-name>
         </score-instrument>
-      <midi-device id="P1-I1" port="1"/>
+      <midi-device id="P1-I1" port="1"></midi-device>
       <midi-instrument id="P1-I1">
         <midi-channel>1</midi-channel>
         <volume>78.7402</volume>
@@ -472,7 +473,7 @@
         <beam number="1">continue</beam>
         <lyric number="1">
           <syllabic>begin</syllabic>
-          <text>&#234;</text>
+          <text>ê</text>
           </lyric>
         </note>
       <note default-x="431.04" default-y="-40.00">
@@ -762,7 +763,7 @@
         </note>
       <direction placement="above">
         <direction-type>
-          <words font-family="Times New Roman" font-size="10.2313">Texte et musique:Communaut&#233; du Chemin Neuf</words>
+          <words font-family="Times New Roman" font-size="10.2313">Texte et musique:Communauté du Chemin Neuf</words>
           </direction-type>
         <staff>1</staff>
         </direction>
@@ -1782,7 +1783,7 @@
         <beam number="1">continue</beam>
         <lyric number="1">
           <syllabic>begin</syllabic>
-          <text>&#234;</text>
+          <text>ê</text>
           </lyric>
         </note>
       <note default-x="414.35" default-y="-40.00">
@@ -2939,7 +2940,7 @@
           </lyric>
         <lyric number="3">
           <syllabic>middle</syllabic>
-          <text>gu&#233;</text>
+          <text>gué</text>
           </lyric>
         <lyric number="4">
           <syllabic>middle</syllabic>
@@ -3354,7 +3355,7 @@
           </lyric>
         <lyric number="3">
           <syllabic>begin</syllabic>
-          <text>r&#232;</text>
+          <text>rè</text>
           </lyric>
         <lyric number="4">
           <syllabic>end</syllabic>
@@ -3447,7 +3448,7 @@
           </lyric>
         <lyric number="2">
           <syllabic>end</syllabic>
-          <text>&#224;</text>
+          <text>à</text>
           </lyric>
         <lyric number="3">
           <syllabic>begin</syllabic>
@@ -3523,12 +3524,12 @@
           </lyric>
         <lyric number="3">
           <syllabic>single</syllabic>
-          <text>ch&#233;.</text>
+          <text>ché.</text>
           <extend/>
           </lyric>
         <lyric number="4">
           <syllabic>single</syllabic>
-          <text>l&#233;.</text>
+          <text>lé.</text>
           <extend/>
           </lyric>
         <lyric number="5">
@@ -3682,7 +3683,7 @@
         </print>
       <direction placement="above">
         <direction-type>
-          <words font-weight="bold" font-family="Times New Roman" font-size="10.6299">&#169; Audiovisuel Musique Evang&#233;lisation AME - R&#233;f. CD7-1 </words>
+          <words font-weight="bold" font-family="Times New Roman" font-size="10.6299">© Audiovisuel Musique Evangélisation AME - Réf. CD7-1 </words>
           <words font-weight="normal">    10 rue Henri IV, 69287 Lyon Cedex 02 - www.ame-boutique.com</words>
           </direction-type>
         <staff>1</staff>
@@ -3690,7 +3691,7 @@
       <direction placement="above">
         <direction-type>
           <words font-weight="bold" font-family="Times New Roman" font-size="11.4272">Utilisation </words>
-          <words font-size="10.3642">:  chant d'envoi, t&#233;moignage</words>
+          <words font-size="10.3642">:  chant d'envoi, témoignage</words>
           </direction-type>
         <staff>1</staff>
         </direction>
@@ -3708,13 +3709,13 @@
         </direction>
       <direction placement="above">
         <direction-type>
-          <words font-family="Times New Roman" font-size="10.2313">3. Par vous il veut gu&#233;rir    Et consoler les hommes,    Car son r&#232;gne s&#8217;est approch&#233;.    Gardez courage, vous trouverez en lui    Votre repos.</words>
+          <words font-family="Times New Roman" font-size="10.2313">3. Par vous il veut guérir    Et consoler les hommes,    Car son règne s’est approché.    Gardez courage, vous trouverez en lui    Votre repos.</words>
           </direction-type>
         <staff>1</staff>
         </direction>
       <direction placement="above">
         <direction-type>
-          <words font-family="Times New Roman" font-size="10.2313">1. Par vous il veut aimer    Et rencontrer les hommes,    L&#8217;amour dont vous vous aimerez    Sera le signe de l&#8217;alliance de Dieu     Jour apr&#232;s jour.</words>
+          <words font-family="Times New Roman" font-size="10.2313">1. Par vous il veut aimer    Et rencontrer les hommes,    L’amour dont vous vous aimerez    Sera le signe de l’alliance de Dieu     Jour après jour.</words>
           </direction-type>
         <staff>1</staff>
         </direction>
@@ -3878,7 +3879,7 @@
       <direction placement="above">
         <direction-type>
           <words font-weight="bold" font-family="Times New Roman" font-size="10.2313">ALLEZ, DIEU VOUS ENVOIE</words>
-          <words font-weight="normal">Texte et musique: Communaut&#233; du Chemin Neuf</words>
+          <words font-weight="normal">Texte et musique: Communauté du Chemin Neuf</words>
           </direction-type>
         <staff>1</staff>
         </direction>
@@ -3916,7 +3917,7 @@
         </note>
       <direction placement="above">
         <direction-type>
-          <words font-family="Times New Roman" font-size="10.2313">Ref. Allez, Dieu vous envoie,        Vous &#234;tes dans le monde        Les membres d'un seul Corps.       Allez, Dieu vous envoie,       Vous &#234;tes dans le monde       Les membres d'un seul Corps.</words>
+          <words font-family="Times New Roman" font-size="10.2313">Ref. Allez, Dieu vous envoie,        Vous êtes dans le monde        Les membres d'un seul Corps.       Allez, Dieu vous envoie,       Vous êtes dans le monde       Les membres d'un seul Corps.</words>
           </direction-type>
         <staff>1</staff>
         </direction>
@@ -3982,13 +3983,13 @@
         </direction>
       <direction placement="above">
         <direction-type>
-          <words font-family="Opus Chords Std" font-size="9.4341">C"m</words>
+          <words font-family="Opus Chords Std" font-size="9.4341">C&quot;m</words>
           </direction-type>
         <staff>1</staff>
         </direction>
       <direction placement="above">
         <direction-type>
-          <words font-family="Times New Roman" font-size="10.2313">4. Par vous il veut sauver    Et relever les hommes,    Car il est l&#8217;agneau immol&#233;.    La vie triomphe par le nom de J&#233;sus    Ressuscit&#233;.</words>
+          <words font-family="Times New Roman" font-size="10.2313">4. Par vous il veut sauver    Et relever les hommes,    Car il est l’agneau immolé.    La vie triomphe par le nom de Jésus    Ressuscité.</words>
           </direction-type>
         <staff>1</staff>
         </direction>
@@ -4024,7 +4025,7 @@
           </lyric>
         <lyric number="2">
           <syllabic>middle</syllabic>
-          <text>t&#233;</text>
+          <text>té</text>
           </lyric>
         <lyric number="3">
           <syllabic>middle</syllabic>
@@ -4073,7 +4074,7 @@
         </note>
       <direction placement="above">
         <direction-type>
-          <words font-family="Times New Roman" font-size="10.2313">               ALLEZ, DIEU VOUS ENVOIE                T58-28Texte et musique: Communaut&#233; du Chemin Neuf</words>
+          <words font-family="Times New Roman" font-size="10.2313">               ALLEZ, DIEU VOUS ENVOIE                T58-28Texte et musique: Communauté du Chemin Neuf</words>
           </direction-type>
         <staff>1</staff>
         </direction>
@@ -4103,7 +4104,7 @@
           </lyric>
         <lyric number="4">
           <syllabic>begin</syllabic>
-          <text>J&#233;</text>
+          <text>Jé</text>
           </lyric>
         <lyric number="5">
           <syllabic>single</syllabic>
@@ -4275,13 +4276,13 @@
         </note>
       <direction placement="above">
         <direction-type>
-          <words font-family="Times New Roman" font-size="10.2313">2.  Par vous il veut parler     Et rejoindre les hommes,     Lorsque vous aurez &#224; parler     Soyez sans crainte, l&#8217;Esprit t&#233;moignera     Par votre voix.</words>
+          <words font-family="Times New Roman" font-size="10.2313">2.  Par vous il veut parler     Et rejoindre les hommes,     Lorsque vous aurez à parler     Soyez sans crainte, l’Esprit témoignera     Par votre voix.</words>
           </direction-type>
         <staff>1</staff>
         </direction>
       <direction placement="above">
         <direction-type>
-          <words font-family="Times New Roman" font-size="10.2313">5. Par vous il veut unir    Et rassembler les hommes,    Il vous envoie pour l&#8217;annoncer.    Il est la vigne qui donnera le fruit    De l&#8217;unit&#233;.</words>
+          <words font-family="Times New Roman" font-size="10.2313">5. Par vous il veut unir    Et rassembler les hommes,    Il vous envoie pour l’annoncer.    Il est la vigne qui donnera le fruit    De l’unité.</words>
           </direction-type>
         <staff>1</staff>
         </direction>
@@ -4313,7 +4314,7 @@
         <staff>1</staff>
         <lyric number="1">
           <syllabic>single</syllabic>
-          <text>pr&#232;s</text>
+          <text>près</text>
           </lyric>
         <lyric number="2">
           <syllabic>end</syllabic>
@@ -4361,11 +4362,11 @@
           </lyric>
         <lyric number="4">
           <syllabic>single</syllabic>
-          <text>t&#233;.</text>
+          <text>té.</text>
           </lyric>
         <lyric number="5">
           <syllabic>single</syllabic>
-          <text>t&#233;.</text>
+          <text>té.</text>
           </lyric>
         </note>
       <backup>
