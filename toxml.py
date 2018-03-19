@@ -7,8 +7,10 @@ import math
 
 from parameters import column_infos_from_header
 
+
 def isNan(value):
     return not isinstance(value, str) and math.isnan(value)
+
 
 def safe_child(parent, child_name):
     """
@@ -96,13 +98,6 @@ def convert_one_file(xlsx, column_info, input_path, output_path):
     # which has the title closest to the filename
     row = result[0]
     song_id, song_data = row  # take the first (best) result
-
-    def safe_value(key):
-        """Deals with unset columns, resulting in NaN values"""
-        value = song_data[column_names[key]]
-        if not isinstance(value, str) and math.isnan(value):
-            value = ' '  # TODO: make sure this placeholder is a good idea
-        return str(value)
 
     # print('Selected XLSX row {} ({}): "{}"'.format(
     #     song_id, safe_value('work-number'), safe_value('work-title')

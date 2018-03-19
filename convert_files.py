@@ -34,7 +34,9 @@ if __name__ == '__main__':
                                                  'from XLSX file')
     parser.add_argument('--input_directory', type=str, default='./input',
                         help='Directory path containing XML files to convert')
-    parser.add_argument('--xlsx_path', type=str, default='./metadata_tel_train.xlsx',
+    parser.add_argument('--xlsx_path', type=str,
+                        default='./metadata_v13.xlsx',
+                        # default='./metadata_tel_train.xlsx',
                         help='Path to the XLSX file containing metadata about '
                              'songs')
     parser.add_argument('--output_directory', type=str, default='./output',
