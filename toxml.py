@@ -5,20 +5,27 @@ import pandas as pd  # xlsx requires xlrd (pip install xlrd)
 import os
 import math
 
-from parameters import column_infos_from_header
 
-
-def isNan(value):
-    return not isinstance(value, str) and math.isnan(value)
-
-
-def safe_child(parent, child_name):
+def safe_child(parent, child_name, rightAfterElem=None, rightBeforeElem=None,
+               appendFront=False, forceNew=False):
     """
     :rtype: object: the child of a parent if it exists, a new one otherwise
     """
-    child = parent.find('./{}'.format(child_name))
+    child = None
+    if not forceNew:
+        child = parent.find('./{}'.format(child_name))
     if child is None:
-        child = ET.SubElement(parent, child_name)
+        child = ET.Element(child_name)
+        if rightAfterElem is not None:  # cf https://stackoverflow.com/a/7475897
+            # contentnav = tree.find(".//div[@id='content_nav']")
+            # parent = rightAfterElem.getparent()
+            parent.insert(parent.index(rightAfterElem) + 1, child)
+        elif rightBeforeElem is not None:
+            parent.insert(parent.index(rightBeforeElem), child)
+        elif appendFront:
+            parent.insert(0, child)
+        else:
+            child = ET.SubElement(parent, child_name)
     return child
 
 
@@ -38,33 +45,10 @@ def find_or_create_with_values(parent, children_tag_names, attr_to_text):
 
     not_yet_handled = set(attr_to_text.keys()).difference(set(already_handled_keys))
     for key in not_yet_handled:
-        child = ET.SubElement(parent, children_tag_names)
-        child.set(key, key)
+        # child = ET.SubElement(parent, children_tag_names)
+        child = safe_child(parent, children_tag_names, appendFront=True, forceNew=True)
+        child.set('type', key)
         child.text = attr_to_text[key]
-
-
-def row_to_field(base_name, row, column_info, default=None):
-    column_names, various_names_to_tag = column_info
-    data = row[1]
-    base_name_dot = base_name + '.'
-    titles = [name for name in column_names if (name == base_name or base_name_dot in name) and not isNan(data.loc[name])]
-    if len(titles) == 0:
-        return default
-    elif len(titles) == 1:
-        return titles[0]
-    else:
-        beginning_of_digits = len(base_name_dot)
-        maxTitle = None
-        maxValue = 0
-        for title in titles:
-            try:
-                value = int(title[beginning_of_digits:])
-            except ValueError:
-                value = 0
-            if value > maxValue:
-                maxValue = value
-                maxTitle = title
-        return maxTitle
 
 
 def columnBaseNamesFromColumnInfo(column_info):
@@ -82,83 +66,83 @@ def columnBaseNamesFromColumnInfo(column_info):
     return baseNameToNames, nameToBaseName
 
 
-def convert_one_file(xlsx, column_info, input_path, output_path):
-    column_names, various_names_to_tag = column_info
-    filename = os.path.basename(input_path)  # extract the end of file path
-    print('Processing {} ...'.format(filename))
-    filename = os.path.splitext(filename)[0]  # remove the extension from the name
-    result = sorted(xlsx.iterrows(),
+def findBestMatchingRow(filename, data, tagNameToColumnIndex):
+    search_results = sorted(data.iterrows(),
                     key=lambda row: difflib.SequenceMatcher(None,
-                        # row[1][column_names['original_title']], # uncomment this line and comment the next one to match files with main title instead of local name
-                        row_to_field('titre', row, column_info, default='titre'),
+                        row[1][tagNameToColumnIndex['workTitle']],
                         filename).ratio(),
                     reverse=True  # see https://stackoverflow.com/a/17903726
                     # This might be a better approach: https://stackoverflow.com/a/36132391
                     )  # sort row of xlsx to get the row
-    # which has the title closest to the filename
-    row = result[0]
-    song_id, song_data = row  # take the first (best) result
 
-    # print('Selected XLSX row {} ({}): "{}"'.format(
-    #     song_id, safe_value('work-number'), safe_value('work-title')
-    # ))
+    selection = search_results[0]
+    print('Selected XLSX row {}: "{}"'.format(
+        selection[0], selection[1][tagNameToColumnIndex['workTitle']]
+    ))
+    return selection
 
 
-    # update xml file
-    tree = ET.parse(input_path)
-    root = tree.getroot()
+def injectMetadata(xmlTree, rowData, tagNameToColumnIndex):
+    rootElem = xmlTree.getroot()
+    workElem = safe_child(rootElem, 'work')
+    identificationElem = safe_child(rootElem, 'identification')
+    encodingElem = safe_child(identificationElem, 'encoding')
 
-    work = safe_child(root, 'work')
-
-    # convert legacy tag names into new tag names
-    def convert_if_exist(parent, child_name, new_child_name):
-        """
-        """
-        try:
-            child = parent.find('./{}'.format(child_name))
-        except KeyError:
-            child = None
-
-        if child is None:
-            pass
-        else:
-            child.tag = new_child_name
-        return child
-
-    identification = safe_child(root, 'identification')
-    for legacy_name, new_name in various_names_to_tag.items():
-        convert_if_exist(work, legacy_name, new_name)
-        convert_if_exist(identification, legacy_name, new_name)
-
-    # fill tags with proper metadata, or with ' ' placeholder
-    baseNameToNames, nameToBaseName = columnBaseNamesFromColumnInfo(column_info)
-    for baseName in baseNameToNames:
-        xml_elem = safe_child(identification, baseName)
-        overloading_column_name = row_to_field(baseName, row,
-                                               column_info, baseName)
-        value = song_data[overloading_column_name]
+    def safeValue(tagName):
+        """Deals with unset columns, resulting in NaN values"""
+        value = rowData[tagNameToColumnIndex[tagName]]
         if not isinstance(value, str) and math.isnan(value):
-            value = ' '
-        xml_elem.text = str(value)
+            value = ' '  # TODO: make sure this placeholder is a good idea
+        return str(value)
+
+    for tagName in sorted(tagNameToColumnIndex.keys()):
+        if tagName in ['creationDate', 'originalFormat', 'platform']:
+            print('Warning: tag "{}" will be lost when importing '
+                  'to MuseScore'.format(tagName))
+        elif tagName == 'arranger':
+            find_or_create_with_values(identificationElem, 'creator', {
+                'arranger': safeValue('arranger'),
+            })
+        elif tagName == 'workTitle':
+            elem = safe_child(workElem, 'work-title')
+            elem.text = safeValue(tagName)
+        elif tagName == 'workNumber':
+            elem = safe_child(workElem, 'work-number', appendFront=True)
+            elem.text = safeValue(tagName)
+        elif tagName == 'composer':
+            find_or_create_with_values(identificationElem, 'creator', {
+                'composer': safeValue('composer'),
+            })
+        elif tagName == 'copyright':
+            elem = safe_child(identificationElem, 'rights')
+            elem.text = safeValue(tagName)
+        elif tagName == 'lyricist':
+            find_or_create_with_values(identificationElem, 'creator', {
+                'lyricist': safeValue('lyricist'),
+            })
+        elif tagName == 'movementNumber':
+            elem = safe_child(rootElem, 'movement-number', rightAfterElem=workElem)
+            elem.text = safeValue(tagName)
+        elif tagName == 'movementTitle':
+            elem = safe_child(rootElem, 'movement-title', rightBeforeElem=identificationElem)
+            elem.text = safeValue(tagName)
+        elif tagName == 'poet':
+            find_or_create_with_values(identificationElem, 'creator', {
+                'poet': safeValue('poet'),
+            })
+        elif tagName == 'source':
+            elem = safe_child(identificationElem, 'source', rightAfterElem=encodingElem)
+            elem.text = safeValue(tagName)
+        elif tagName == 'translator':
+            find_or_create_with_values(identificationElem, 'creator', {
+                'translator': safeValue('translator'),
+            })
+        else:
+            print('Warning: tag {} is unknown.'.format(tagName))
 
 
-    # work_number = safe_child(work, 'work-number')
-    # work_number.text = safe_value('work-number')
-    # work_title = safe_child(work, 'work-title')
-    # work_title.text = safe_value('work-title')
-    #
-    # identification = safe_child(root, 'identification')
-    # find_or_create_with_values(identification, 'creator', {
-    #     'composer': safe_value('composer'),
-    #     'lyricist': safe_value('lyricist'),
-    #     'arranger': safe_value('arranger'),
-    # })
-    #
-    # rights = safe_child(identification, 'rights')
-    # rights.text = safe_value('rights')
-
-    # Save the result to a file
-    tree.write(output_path)
+def injectTextField(xmlTree, rowData, textFieldNameToColumnIndex):
+    pass
 
 
 if __name__ == '__main__':
