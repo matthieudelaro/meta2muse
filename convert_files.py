@@ -33,12 +33,17 @@ def convert(args):
         args.input_directory,
         args.output_directory
     ))
+    conversion_list = []
     for filename in mscz_filenames:
         print('\nProcessing file "{}" ...'.format(filename))
         rowId, rowData = findBestMatchingRow(filename, data, tagNameToColumnIndex)
         inputMsczPath = os.path.join(args.input_directory, filename)
         outputMsczPath = os.path.join(args.output_directory,
                                   os.path.basename(filename))
+        conversion_list.append({
+            'inputMsczPath': inputMsczPath,
+            'outputMsczPath': outputMsczPath,
+        })
         filename_extensionless = os.path.splitext(filename)[0]
         tmp_unzipped_path = os.path.join(tmp_directory, filename_extensionless)
         with zipfile.ZipFile(inputMsczPath, "r") as zip_ref:
@@ -66,7 +71,7 @@ if __name__ == '__main__':
     parser.add_argument('--input_directory', type=str, default='./input',
                         help='Directory path containing XML files to convert')
     parser.add_argument('--xlsx_path', type=str,
-                        default='./metadata_v16.xlsx',
+                        default='./metadata_v15.xlsm',
                         # default='./metadata_tel_train.xlsx',
                         help='Path to the XLSX file containing metadata about '
                              'songs')
@@ -74,3 +79,4 @@ if __name__ == '__main__':
                         help='Directory path where to store the new XML files')
     args = parser.parse_args()
     convert(args)
+    input("Press any key to continue...")

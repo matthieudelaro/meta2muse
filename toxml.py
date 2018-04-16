@@ -69,7 +69,7 @@ def columnBaseNamesFromColumnInfo(column_info):
 def findBestMatchingRow(filename, data, tagNameToColumnIndex):
     search_results = sorted(data.iterrows(),
                     key=lambda row: difflib.SequenceMatcher(None,
-                        row[1][tagNameToColumnIndex['workTitle']],
+                        str(row[1][tagNameToColumnIndex['workTitle']]),
                         filename).ratio(),
                     reverse=True  # see https://stackoverflow.com/a/17903726
                     # This might be a better approach: https://stackoverflow.com/a/36132391
