@@ -5,6 +5,8 @@ import pandas as pd  # xlsx requires xlrd (pip install xlrd)
 import os
 import math
 
+from logger import print
+
 
 def safe_child(parent, child_name, rightAfterElem=None, rightBeforeElem=None,
                appendFront=False, forceNew=False):
@@ -100,4 +102,6 @@ def injectMetadata(xmlTree, rowData, tagNameToColumnIndex):
 
 
 def injectTextField(xmlTree, rowData, textFieldNameToColumnIndex):
+    # rootElem = xmlTree.getroot()
+    # scoreElem = safe_child(rootElem, 'Staff')
     pass

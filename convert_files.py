@@ -8,17 +8,24 @@ import shutil
 from toxml import findBestMatchingRow, injectMetadata, \
     injectTextField
 
+import logger
+from logger import print
+
 
 def convert(args):
     args.input_directory = os.path.abspath(args.input_directory)
     args.output_directory = os.path.abspath(args.output_directory)
     tmp_directory = os.path.abspath(os.path.join(args.output_directory, 'temp'))
 
-    for path in [args.output_directory, tmp_directory]:
+    for path in [args.output_directory, tmp_directory, args.parameters_directory]:
         if not os.path.exists(path):
             os.makedirs(path)
 
-    xlsx = pd.read_excel(args.xlsx_path, header=None)
+    logger_output_filepath = os.path.abspath(os.path.join(tmp_directory, 'logs.txt'))
+    logger.config(logger_output_filepath)
+
+    xlsx_filepath = os.path.abspath(os.path.join(args.parameters_directory, 'metadata.xlsm'))
+    xlsx = pd.read_excel(xlsx_filepath, header=None)
     columnIndexToTagName = {columnIndex: tagName for columnIndex, tagName in xlsx.iloc[0].items() if isinstance(tagName, str)}
     tagNameToColumnIndex = {value: key for key, value in columnIndexToTagName.items()}
     columnIndexToTextFieldName = {columnIndex: tagName for columnIndex, tagName in xlsx.iloc[1].items() if isinstance(tagName, str)}
@@ -35,7 +42,8 @@ def convert(args):
     ))
     conversion_list = []
     for filename in mscz_filenames:
-        print('\nProcessing file "{}" ...'.format(filename))
+        print('')
+        print('Processing file "{}" ...'.format(filename))
         rowId, rowData = findBestMatchingRow(filename, data, tagNameToColumnIndex)
         inputMsczPath = os.path.join(args.input_directory, filename)
         outputMsczPath = os.path.join(args.output_directory,
@@ -70,13 +78,17 @@ if __name__ == '__main__':
                                                  'from XLSX file')
     parser.add_argument('--input_directory', type=str, default='./input',
                         help='Directory path containing XML files to convert')
-    parser.add_argument('--xlsx_path', type=str,
-                        default='./metadata_v15.xlsm',
+    parser.add_argument('--parameters_directory', type=str,
+                        default='./parameters',
                         # default='./metadata_tel_train.xlsx',
-                        help='Path to the XLSX file containing metadata about '
-                             'songs')
+                        help='Directory path containing metadata.xlsm, '
+                             'mapping.xlsx, etc')
+    # parser.add_argument('--xlsx_path', type=str,
+    #                     default='./metadata_v15.xlsm',
+    #                     # default='./metadata_tel_train.xlsx',
+    #                     help='Path to the XLSX file containing metadata about '
+    #                          'songs')
     parser.add_argument('--output_directory', type=str, default='./output',
                         help='Directory path where to store the new XML files')
     args = parser.parse_args()
     convert(args)
-    input("Press any key to continue...")

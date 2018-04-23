@@ -2,3 +2,8 @@ lxml
 difflib
 pandas
 xlrd
+numpy
+python-dateutil
+pytz
+setuptools
+six
