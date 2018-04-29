@@ -106,7 +106,10 @@ def persist(args):
         try:
             row[FILTER_NAME_VALUE] = fileData[ROW_DATA][tagNameToColumnIndex[FILTER_NAME_VALUE]]
         except KeyError:
-            row[FILTER_NAME_VALUE] = ''
+            try:
+                row[FILTER_NAME_VALUE] = fileData[FILTER_NAME_VALUE]
+            except KeyError:
+                row[FILTER_NAME_VALUE] = ''
         row[SEPARATOR_COLUMN_NAME] = ' _ => _ '
         try:
             row[ID_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[ID_TAG]]
@@ -116,10 +119,6 @@ def persist(args):
             row[ROW_ID] = fileData[ROW_ID]
         except KeyError:
             row[ROW_ID] = ''
-        try:
-            row[WORK_TITLE_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[WORK_TITLE_TAG]]
-        except KeyError:
-            row[WORK_TITLE_TAG] = ''
         try:
             row[TITRE_ORIGINAL_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[TITRE_ORIGINAL_TAG]]
         except KeyError:
