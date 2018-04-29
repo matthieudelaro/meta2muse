@@ -98,17 +98,36 @@ def persist(args):
     outputPath = os.path.abspath(
             os.path.join(args.parameters_directory,
                          'auto_generated_mapping_{}.xlsx'.format(str(datetime.now()).replace(':', '_'))))
+
     rows = []
     for filename, fileData in filenameToData.items():
         row = OrderedDict()
         row[FILENAME] = filename
-        row[FILTER_NAME_VALUE] = fileData[ROW_DATA][tagNameToColumnIndex[FILTER_NAME_VALUE]]
+        try:
+            row[FILTER_NAME_VALUE] = fileData[ROW_DATA][tagNameToColumnIndex[FILTER_NAME_VALUE]]
+        except KeyError:
+            row[FILTER_NAME_VALUE] = ''
         row[SEPARATOR_COLUMN_NAME] = ' _ => _ '
-        row[ID_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[ID_TAG]]
-        row[ROW_ID] = fileData[ROW_ID]
-        row[WORK_TITLE_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[WORK_TITLE_TAG]]
-        row[TITRE_ORIGINAL_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[TITRE_ORIGINAL_TAG]]
-        row[LOGS] = fileData[LOGS]
+        try:
+            row[ID_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[ID_TAG]]
+        except KeyError:
+            row[ID_TAG] = ''
+        try:
+            row[ROW_ID] = fileData[ROW_ID]
+        except KeyError:
+            row[ROW_ID] = ''
+        try:
+            row[WORK_TITLE_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[WORK_TITLE_TAG]]
+        except KeyError:
+            row[WORK_TITLE_TAG] = ''
+        try:
+            row[TITRE_ORIGINAL_TAG] = fileData[ROW_DATA][tagNameToColumnIndex[TITRE_ORIGINAL_TAG]]
+        except KeyError:
+            row[TITRE_ORIGINAL_TAG] = ''
+        try:
+            row[LOGS] = fileData[LOGS]
+        except KeyError:
+            row[LOGS] = 'Could not find data about this file\n'
         rows.append(row)
     dataframe = pd.DataFrame.from_records(rows)
     with pd.ExcelWriter(outputPath) as writer:
