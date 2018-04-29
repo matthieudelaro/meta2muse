@@ -1,7 +1,13 @@
 import argparse
 import os
+import shutil
+import sys
 import logger
 from logger import print
+logger.config(os.path.join(
+        os.path.split(os.path.abspath(sys.modules[__name__].__file__))[0],
+        'logs.txt'
+    ))
 
 
 if __name__ == '__main__':
@@ -19,6 +25,10 @@ if __name__ == '__main__':
     parser.add_argument('--do_not_auto_upgrade', type=bool, default=False,
                         help='Will download all the requirements, upgrade pip, ...')
     args = parser.parse_args()
+    args.input_directory = os.path.abspath(args.input_directory)
+    args.output_directory = os.path.abspath(args.output_directory)
+    if os.path.exists(args.output_directory):
+        shutil.rmtree(args.output_directory)
     if not args.do_not_auto_upgrade:
         import upgrade
         try:
@@ -39,24 +49,18 @@ from toxml import findBestMatchingRow, injectMetadata, \
     injectTextField, safe_child
 import mapping
 
-import trans
+# import trans
 
 
 def convert(args):
-    args.input_directory = os.path.abspath(args.input_directory)
-    args.output_directory = os.path.abspath(args.output_directory)
     tmp_directory = os.path.abspath(os.path.join(args.output_directory, 'temp'))
 
     for path in [args.output_directory, tmp_directory, args.parameters_directory]:
         if not os.path.exists(path):
             os.makedirs(path)
 
-    # clean up tmp folder
-    shutil.rmtree(tmp_directory)
-    os.makedirs(tmp_directory)
-
-    logger_output_filepath = os.path.abspath(os.path.join(tmp_directory, 'logs.txt'))
-    logger.config(logger_output_filepath)
+    # logger_output_filepath = os.path.abspath(os.path.join(tmp_directory, 'logs.txt'))
+    # logger.config(logger_output_filepath)
 
     xlsx_filepath = os.path.abspath(os.path.join(args.parameters_directory, 'metadata.xlsm'))
     xlsx = pd.read_excel(xlsx_filepath, header=None)
@@ -101,8 +105,8 @@ def convert(args):
                           for filename in os.listdir(tmp_unzipped_path)
                           if os.path.splitext(filename)[-1].lower() == '.mscx']
         original_mscx_filename = mscx_filenames[0]
-        # ascii_mscx_filename = trans.trans(original_mscx_filename)
-        ascii_mscx_filename = trans.trans('{}.mscx'.format(filename_extensionless))
+        # ascii_mscx_filename = trans.trans('{}.mscx'.format(filename_extensionless))
+        ascii_mscx_filename = 'file.mscx'
         original_tmp_mscx_path = os.path.join(tmp_unzipped_path, original_mscx_filename)
         safe_tmp_mscx_path = os.path.join(tmp_unzipped_path, ascii_mscx_filename)
         os.rename(original_tmp_mscx_path, safe_tmp_mscx_path)
