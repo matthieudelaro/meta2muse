@@ -1,5 +1,7 @@
 import argparse
 import os
+import logger
+from logger import print
 
 
 if __name__ == '__main__':
@@ -10,23 +12,22 @@ if __name__ == '__main__':
                         help='Directory path containing XML files to convert')
     parser.add_argument('--parameters_directory', type=str,
                         default='./parameters',
-                        # default='./metadata_tel_train.xlsx',
                         help='Directory path containing metadata.xlsm, '
                              'mapping.xlsx, etc')
-    # parser.add_argument('--xlsx_path', type=str,
-    #                     default='./metadata_v15.xlsm',
-    #                     # default='./metadata_tel_train.xlsx',
-    #                     help='Path to the XLSX file containing metadata about '
-    #                          'songs')
     parser.add_argument('--output_directory', type=str, default='./output',
                         help='Directory path where to store the new XML files')
     parser.add_argument('--do_not_auto_upgrade', type=bool, default=False,
-
-                        help='Will download all ther requirements, upgrade pip, ...')
+                        help='Will download all the requirements, upgrade pip, ...')
     args = parser.parse_args()
     if not args.do_not_auto_upgrade:
         import upgrade
-        upgrade.checkRequirements()
+        try:
+            upgrade.checkRequirements()
+        except Exception as e:
+            print('Did not install Python packages, '
+                  'but maybe are they already available...\n{}\n{}'.format(
+                e, str(e))
+            )
 
 
 import zipfile
@@ -36,9 +37,8 @@ from lxml import etree as ET
 
 from toxml import findBestMatchingRow, injectMetadata, \
     injectTextField, safe_child
+import mapping
 
-import logger
-from logger import print
 import trans
 
 
@@ -74,22 +74,24 @@ def convert(args):
         args.input_directory,
         args.output_directory
     ))
+
     # TODO: load mapping from file
+    mapping.load(args)
     # TODO: for each file, check if already mapped. Otherwise compute mapping
+    for filename in mscz_filenames:
+        mapping.checkFile(filename, data, tagNameToColumnIndex)
     # TODO: persist mapping
+    mapping.persist(args)
     # TODO: process files
-    conversion_list = []
     for filename in mscz_filenames:
         print('')
         print('Processing file "{}" ...'.format(filename))
-        rowId, rowData = findBestMatchingRow(filename, data, tagNameToColumnIndex)
         inputMsczPath = os.path.join(args.input_directory, filename)
         outputMsczPath = os.path.join(args.output_directory,
                                   os.path.basename(filename))
-        conversion_list.append({
-            'inputMsczPath': inputMsczPath,
-            'outputMsczPath': outputMsczPath,
-        })
+        # rowId, rowData = findBestMatchingRow(filename, data, tagNameToColumnIndex)
+        fileData = mapping.checkFile(filename, data, tagNameToColumnIndex)
+        rowData = fileData[mapping.ROW_DATA]
         filename_extensionless = os.path.splitext(filename)[0]
         tmp_unzipped_path = os.path.join(tmp_directory, filename_extensionless)
         # https://stackoverflow.com/questions/1807063/extract-files-with-invalid-characters-in-filename-with-python
