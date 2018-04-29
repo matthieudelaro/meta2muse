@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import shutil
 from lxml import etree as ET
 import difflib

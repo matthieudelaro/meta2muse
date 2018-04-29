@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import argparse
 import os
 import shutil
@@ -5,9 +6,9 @@ import sys
 import logger
 from logger import print
 logger.config(os.path.join(
-        os.path.split(os.path.abspath(sys.modules[__name__].__file__))[0],
-        'logs.txt'
-    ))
+    os.path.split(os.path.abspath(sys.modules[__name__].__file__))[0],
+    'logs.txt'
+))
 
 
 if __name__ == '__main__':
